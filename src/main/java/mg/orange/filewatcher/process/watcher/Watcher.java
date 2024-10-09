@@ -12,18 +12,39 @@ import java.nio.file.WatchService;
 public class Watcher implements WatcherInterface {
     private Runnable startAction;
     private Runnable shutdownAction;
+    private String fileDirectory;
+    private String fileName;
+    private String cacheDirPath;
 
     public Watcher(){}
 
-    public Watcher(Runnable startAction, Runnable shutdownAction){
+    public Watcher(
+        String fileDirectory,
+        String fileName,
+        String cacheDirPath,
+        Runnable startAction,
+        Runnable shutdownAction)
+    {
+        this.cacheDirPath = cacheDirPath;
+        this.fileDirectory = fileDirectory;
+        this.fileName = fileName;
+        this.startAction = startAction;
+        this.startAction = startAction;
+        this.shutdownAction = shutdownAction;
+    }
+
+    public Watcher(
+        Runnable startAction, 
+        Runnable shutdownAction
+    ){
         this.startAction = startAction;
         this.shutdownAction = shutdownAction;
     }
 
     @Override
     public void watch(Runnable... actions) {
-        atShutdown(shutdownAction);
-        atStart(startAction);
+        atShutdown(getShutdownAction());
+        atStart(getStartAction());
 
         for (Runnable action : actions) {
             action.run();
@@ -32,7 +53,7 @@ public class Watcher implements WatcherInterface {
 
     @Override
     public void atShutdown(Runnable shutdownAction) {
-        Runtime.getRuntime().addShutdownHook(new Thread(shutdownAction));
+        Runtime.getRuntime().addShutdownHook(new Thread(()->shutdownAction.run()));
     }
 
     @Override
@@ -87,4 +108,27 @@ public class Watcher implements WatcherInterface {
     public void setShutdownAction(Runnable shutdownAction) {
         this.shutdownAction = shutdownAction;
     }
+
+    public String getFileDirectory() {
+        return fileDirectory;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileDirectory(String fileDirectory) {
+        this.fileDirectory = fileDirectory;
+    }
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+    public String getCacheDirPath() {
+        return cacheDirPath;
+    }
+    
+    public void setCacheDirPath(String cacheDirPath) {
+        this.cacheDirPath = cacheDirPath;
+    }
+
 }
