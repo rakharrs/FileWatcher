@@ -1,24 +1,5 @@
 package mg.orange.filewatcher.diff;
 
-/*
- * Diff Match and Patch
- * Copyright 2018 The diff-match-patch Authors.
- * https://github.com/google/diff-match-patch
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -98,17 +79,6 @@ public class DiffMatch {
 
     //  DIFF FUNCTIONS
 
-
-    /**
-     * The data structure representing a diff is a Linked list of Diff objects:
-     * {Diff(Operation.DELETE, "Hello"), Diff(Operation.INSERT, "Goodbye"),
-     *  Diff(Operation.EQUAL, " world.")}
-     * which means: delete "Hello", add "Goodbye" and keep " world."
-     */
-    public enum Operation {
-        DELETE, INSERT, EQUAL
-    }
-
     /**
      * Find the differences between two texts.
      * Run a faster, slightly less optimal diff.
@@ -119,19 +89,7 @@ public class DiffMatch {
      * @return Linked List of Diff objects.
      */
 
-    public static void main(String[] args) {
-        DiffMatch test = new DiffMatch();
-        System.out.println(test.diff_main(
-                "trente-deux,32\n" +
-                        "trente-un,32\n"+
-                "trente-trois,33",
 
-                "trente-deux,32\n" +
-                        "trente-un,31\n"+
-                "trente-trois,33", false));
-        // Get the file file.csv from resource
-
-    }
     public LinkedList<Diff> diff_main(String text1, String text2) {
         return diff_main(text1, text2, true);
     }
@@ -2315,85 +2273,6 @@ public class DiffMatch {
         }
         return patches;
     }
-
-
-    /**
-     * Class representing one diff operation.
-     */
-    public static class Diff {
-        /**
-         * One of: INSERT, DELETE or EQUAL.
-         */
-        public Operation operation;
-        /**
-         * The text associated with this diff operation.
-         */
-        public String text;
-
-        /**
-         * Constructor.  Initializes the diff with the provided values.
-         * @param operation One of INSERT, DELETE or EQUAL.
-         * @param text The text being applied.
-         */
-        public Diff(Operation operation, String text) {
-            // Construct a diff with the specified operation and text.
-            this.operation = operation;
-            this.text = text;
-        }
-
-        /**
-         * Display a human-readable version of this Diff.
-         * @return text version.
-         */
-        public String toString() {
-            String prettyText = this.text.replace('\n', '\u00b6');
-            return "Diff(" + this.operation + ",\"" + prettyText + "\")";
-        }
-
-        /**
-         * Create a numeric hash value for a Diff.
-         * This function is not used by DMP.
-         * @return Hash value.
-         */
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = (operation == null) ? 0 : operation.hashCode();
-            result += prime * ((text == null) ? 0 : text.hashCode());
-            return result;
-        }
-
-        /**
-         * Is this Diff equivalent to another Diff?
-         * @param obj Another Diff to compare against.
-         * @return true or false.
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            Diff other = (Diff) obj;
-            if (operation != other.operation) {
-                return false;
-            }
-            if (text == null) {
-                if (other.text != null) {
-                    return false;
-                }
-            } else if (!text.equals(other.text)) {
-                return false;
-            }
-            return true;
-        }
-    }
-
 
     /**
      * Class representing one patch operation.
