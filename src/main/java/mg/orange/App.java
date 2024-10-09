@@ -10,7 +10,9 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
-import mg.orange.process.fileManager.FileManager;
+import mg.orange.filewatcher.process.fileManager.FileManager;
+import mg.orange.filewatcher.process.watcher.Watcher;
+import mg.orange.filewatcher.utils.Misc;
 
 /**
  * Hello world!
@@ -20,61 +22,43 @@ public class App {
     public static void main(String[] args) throws IOException, InterruptedException {
         // Cache dir path
         String tempFilePath = "test/cache";
+
         // FileName to listen in the dir
         String fileName = "test.txt";
+
         // File dir path
         String dirPath = "test";
 
-        // Shutdown hook
-        whenShutdown(tempFilePath, fileName);
+        // Instantiate the watcher class
+        Watcher watcher = new Watcher(
+                // on start
+                () -> FileManager.copyFile(dirPath + "/" + fileName, Misc.buildCacheName(tempFilePath, fileName)),
+                // on shutdown
+                () -> {
+                    File fileToDelete = new File(Misc.buildCacheName(tempFilePath, fileName));
+                    if (fileToDelete.exists()) {
+                        fileToDelete.delete();
+                    } else {
+                        System.out.println("File not found.");
+                    }
+                });
 
         // process daemon...
-        watchFile(dirPath, fileName, tempFilePath);
-    }
-
-    public static void whenShutdown(String tempFilePath, String fileName) {
-        String fileCache = buildCacheName(tempFilePath, fileName);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            File fileToDelete = new File(fileCache);
-            if (fileToDelete.exists()) {
-                fileToDelete.delete();
-            } else {
-                System.out.println("File not found.");
-            }
-        }));
-    }
-
-    public static String buildCacheName(String tempFilePath, String fileName){
-        return tempFilePath+"/cached+"+fileName;
-    }
-
-    public static void watchFile(String pathValue, String fileName, String tempFilePath) throws IOException, InterruptedException {
-        System.out.println("Watching file: " + pathValue);
-
-        // caching the file
-        Path path = Paths.get(pathValue);
-
-        // Copy
-        FileManager.copyFile(pathValue+"/"+fileName, buildCacheName(tempFilePath, fileName));
-
-        // Watch service
-        WatchService watchService = FileSystems.getDefault().newWatchService();
-        WatchKey key = path.register(
-                watchService, StandardWatchEventKinds.ENTRY_MODIFY);
-
-        // Watch for file changes
-        while ((key = watchService.take()) != null) {
-            for (WatchEvent<?> event : key.pollEvents()) {
-                final Path changed = (Path) event.context();
-
-                // Checko for the file
-                if (changed.endsWith(fileName)) {
-
-                    // Processing function...
-                    System.out.println("Event kind:" + event.kind() + "File changed: " + changed);
+        watcher.watch(
+            () -> {
+                try {
+                    watcher.watchFile(
+                        dirPath, 
+                        fileName, 
+                        tempFilePath, 
+                        () -> {
+                            FileManager.copyFile(dirPath + "/" + fileName, Misc.buildCacheName(tempFilePath, fileName));
+                        }
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            key.reset();
-        }
+        );
     }
 }

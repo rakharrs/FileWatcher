@@ -1,11 +1,10 @@
-package mg.orange.process.cacheManager;
+package mg.orange.filewatcher.process.cacheManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class InMemoryCache<K, V> implements Cache<K, V> {
     private Map<K, V> cache = new HashMap<>();
-    private static final long DEFAULT_EXPIRATION_TIME_SECONDS = 3600; // 1 hour
 
     @Override
     public V get(K key) {

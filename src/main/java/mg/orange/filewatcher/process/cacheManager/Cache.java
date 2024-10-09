@@ -1,4 +1,4 @@
-package mg.orange.process.cacheManager;
+package mg.orange.filewatcher.process.cacheManager;
 
 public interface Cache<K, V> {
     V get(K key);

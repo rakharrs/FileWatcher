@@ -1,4 +1,4 @@
-package mg.orange.process.fileManager;
+package mg.orange.filewatcher.process.fileManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
